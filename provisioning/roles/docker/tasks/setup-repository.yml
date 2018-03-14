@@ -1,0 +1,40 @@
+---
+
+- name: Add Docker Repository
+  shell: add-apt-repository \
+         "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+         $(lsb_release -cs) \
+         stable"
+  become: yes
+
+- name: Install pip & Update Cache
+  apt:
+    name: python-pip
+    update_cache: yes
+  become: yes
+
+- name: Uninstall old versions of Docker
+  apt:
+    name: "{{ item }}"
+    state: absent
+  with_items:
+    - docker
+    - docker-engine
+    - docker.io
+  become: yes
+
+- name: Install docker prereq
+  apt:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+    - apt-transport-https
+    - ca-certificates
+    - curl
+    - software-properties-common
+    - python-software-properties
+  become: yes
+
+- name: Add Docker’s official GPG key
+  shell: "curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -" 
+  become: yes
